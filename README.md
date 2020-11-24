@@ -3,6 +3,7 @@
 Infrapunakauko-ohjaimella ohjattavan pikkuauton ohjelma. Arduino nano alustana.
 
 Tarvittavat ominaisuudet:
+
     -Kaukosäätimen nappia painamalla muuttaa nopeutta. Voi olla vaikka MOVE-muuttuja, jonka arvoa muutetaan yksi per painallus. MOVE muuttujan arvot rajoittettu välille -3 -> +3.(miinus taaksepäin ja plussa eteenpäin) ***Pitää tarkistaa onko arduinon analog outputissa mahdollisuus laittaa eri voltages outputtiin
     
     -Kaukosäätimen sivunäppäimet muuttavat TURN-muuttujan arvoa yksi arvo per painallus. Tässä voisi vaihteluväli olla -2 -> +2. 
@@ -10,6 +11,7 @@ Tarvittavat ominaisuudet:
 
 
 Optional features:
+
     -Kaukosäätimen nappien määrittelylle pieni ohjelma, joka tunnistaisi erilaisten kaukosäätimien outputit ja voisi reprogram as a new remote ohjain. 
     (Saattaa olla liian monimutkainen ja tavallaan turha ominaisuus)
     
