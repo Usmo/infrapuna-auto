@@ -45,22 +45,23 @@ void loop()
 
 Nappien koodit:
 
-YLÖS = 800F041E , 800F841E
-ALAS = 800F041F , 800F841F
-OIKEA = 800F0421 , 800F8421
-VASEN = 800F0420 , 800F8420
-OK nappi = 800F0422 , 800F8422
-PARTYVALO nappi (Windows) = 800F040D , 800F840D
+YLÖS = 800F041E , 800F841E          (1E69883 , A36FD29F)
+ALAS = 800F041F , 800F841F          (E696EE , A26FD10A)
+OIKEA = 800F0421 , 800F8421         (8E1449A9 , 79945765)
+VASEN = 800F0420 , 800F8420         (C1C13C4C , 634A7668)
+OK nappi = 800F0422 , 800F8422      (EC9BC835 , 11BBA79)
+PARTYVALO nappi (Windows) = 800F040D , 800F840D (27CFDF92 , 134FED4E)
 
-Koodit vaihtelee vuorotellen, kun nappia painaa
+Koodit vaihtelee vuorotellen, kun nappia painaa. 
+Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran painettu. En tiedä miksi.
 
   */
 
     if (receiver.decode(&results)) {                    //Jos ir-decoderi saa arvon
 
-        if (results.value == 0X800F041E || results.value == 0X800F841E) {  //Verrataan ir-decoderin tulosta YLÖS nappiin
+        if (results.value == 0X800F041E || results.value == 0X800F841E || results.value == 0X1E69883 || results.value == 0XA36FD29F) {  //Verrataan ir-decoderin tulosta YLÖS nappiin
 
-            if (movement = 3){                          //Jos movement on jo valmiiksi 3, ei tehdä mitään ja tulostetaan serialiin teksti
+            if (movement == 3){                          //Jos movement on jo valmiiksi 3, ei tehdä mitään ja tulostetaan serialiin teksti
                 Serial.println("SPEED ALREADY MAXED");
             }
             else {                                      // Jos movement ei ole 3, lisätään movement-muuttujaan ykkönen ja päivitetään nopeus.
@@ -72,9 +73,9 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
             delay(100);                                 // Pieni viive, jotta yhdestä painalluksesta ei rekisteröityisi tahattomia lisäpainalluksia.
         }
 
-        else if (results.value == 0X800F041F || results.value == 0X800F841F){  //Verrataan ir-decoderin tulosta ALAS nappiin
+        else if (results.value == 0X800F041F || results.value == 0X800F841F || results.value == 0XE696EE || results.value == 0XA26FD10A){  //Verrataan ir-decoderin tulosta ALAS nappiin
             
-            if (movement = -3){                         // Jos movement on jo valmiiksi -3, ei tehdä mitään ja tulostetaan serialiin teksti
+            if (movement == -3){                         // Jos movement on jo valmiiksi -3, ei tehdä mitään ja tulostetaan serialiin teksti
                 Serial.println("REVERSE ALREADY MAXED");
             }
             else {                                      // Jos movement ei ole -3, vähennetään muuttujasta ykkönen ja päivitetään nopeus.
@@ -86,9 +87,9 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
             delay(100);                                 // Pieni viive, jotta yhdestä painalluksesta ei rekisteröityisi tahattomia lisäpainalluksia.
         }
 
-        else if (results.value == 0X800F0421 || results.value == 0X800F8421){  //Verrataan ir-decoderin tulosta OIKEA nappiin
+        else if (results.value == 0X800F0421 || results.value == 0X800F8421 || results.value == 0X8E1449A9 || results.value == 0X79945765){  //Verrataan ir-decoderin tulosta OIKEA nappiin
 
-            if (turning = 2){                           // Jos kääntyminen on jo max-arvossa, ei tehdä muuta kuin tulostus serial monitoriin.
+            if (turning == 2){                           // Jos kääntyminen on jo max-arvossa, ei tehdä muuta kuin tulostus serial monitoriin.
                 Serial.println("RIGHT TURNING ALREADY MAXED");
             }
             else {                                      // Muuten lisätään turning-muuttujaan yksi ja päivitetään kääntyminen.
@@ -101,9 +102,9 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
             
         }
 
-        else if (results.value == 0X800F0420 || results.value == 0X800F8420){  //Verrataan ir-decoderin tulosta VASEN nappiin
+        else if (results.value == 0X800F0420 || results.value == 0X800F8420 || results.value == 0XC1C13C4C || results.value == 0X634A7668){  //Verrataan ir-decoderin tulosta VASEN nappiin
 
-            if (turning = -2){                          // Jos kääntyminen on jo max-arvossa, ei tehdä muuta kuin tulostus serial monitoriin.
+            if (turning == -2){                          // Jos kääntyminen on jo max-arvossa, ei tehdä muuta kuin tulostus serial monitoriin.
                 Serial.println("LEFT TURNING ALREADY MAXED");
             }
             else {                                      // Muuten vähennetään turning-muuttujasta yksi ja päivitetään nopeus.
@@ -116,7 +117,7 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
             
         }
 
-        else if (results.value == 0X800F0422 || results.value == 0X800F8422){  //Verrataan ir-decoderin tulosta OK nappiin
+        else if (results.value == 0X800F0422 || results.value == 0X800F8422 || results.value == 0XEC9BC835 || results.value == 0X11BBA79){  //Verrataan ir-decoderin tulosta OK nappiin
 
             turning = 0;                                // STOP, eli kaikki arvot nolliin ja päivitetään nopeus sekä kääntyminen.
             movement = 0;
@@ -128,7 +129,7 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
             
         }
 
-        else if (results.value == 0X800F040D || results.value == 0X800F840D){  //Verrataan ir-decoderin tulosta WINDOWS nappiin
+        else if (results.value == 0X800F040D || results.value == 0X800F840D || results.value == 0X27CFDF92 || results.value == 0X134FED4E){  //Verrataan ir-decoderin tulosta WINDOWS nappiin
 
             if (flashingLightsState = 0){               // Jos valot eivät ole päällä, käynnistetään valot funktiolla
                 startLedFlashing();
@@ -145,25 +146,31 @@ Koodit vaihtelee vuorotellen, kun nappia painaa
 
         else {      //Mikäli tulos ei ole mikään määritellyistä, ei tehdä mitään ja tulostetaan serialimonitoriin teksti
             Serial.println("Not recognized");
+            Serial.println(results.value, HEX);
+
+               
         }
 
-
+    key_value = results.value;
+    receiver.resume();                                  // IR-vastaanotin palautetaan kuuntelemaan uusia komentoja
 
     //Serial.println(results.value, HEX);
     //delay(10);
-  
+    }
 }
 
 
   
-void stopLedFlashing(){         //Timerin rekisterien nollaus, valot lakkaavat vilkkumasta
+void stopLedFlashing()         //Timerin rekisterien nollaus, valot lakkaavat vilkkumasta
+  {
   TCCR1A = 0;           
   TCCR1B = 0;
   digitalWrite(led_pin, LOW);
   }
 
 
-void startLedFlashing(){        //Timerien rekisterit initialized, valot lähtevät vilkkumaan
+void startLedFlashing()        //Timerien rekisterit initialized, valot lähtevät vilkkumaan
+  {
   //TCCR1A = 0;
   //TCCR1B = 0;
   bitSet(TCCR1B, CS12);     // 256 prescaler
@@ -180,58 +187,58 @@ void startLedFlashing(){        //Timerien rekisterit initialized, valot lähtev
     Mitä alemmaksi forward_pin lukema laitetaan, sitä kovempaa mennään eteenpäin , JOS backwards-pin on HIGH arvossa 255.
 */
 
-void speedValuesUpdate(){       //Funktiossa tarkastetaan movement-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
-
-    if (movement = 3){
+void speedValuesUpdate()       //Funktiossa tarkastetaan movement-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
+{
+    if (movement == 3){
         analogWrite(forward_pin, 128);
-        analogWrite(backward_pin, 250);
+        analogWrite(backward_pin, 255);
     }
-    else if (movement = 2){
+    else if (movement == 2){
         analogWrite(forward_pin, 168);
-        analogWrite(backward_pin, 250);
+        analogWrite(backward_pin, 255);
     }
-    else if (movement = 1){
+    else if (movement == 1){
         analogWrite(forward_pin, 198);
-        analogWrite(backward_pin, 250);
+        analogWrite(backward_pin, 255);
     }
-    else if (movement = 0){
+    else if (movement == 0){
         analogWrite(forward_pin, 255);
         analogWrite(backward_pin, 255);
     }
-    else if (movement = -1){
+    else if (movement == -1){
         analogWrite(forward_pin, 255);
         analogWrite(backward_pin, 198);
     }
-    else if (movement = -2){
+    else if (movement == -2){
         analogWrite(forward_pin, 255);
         analogWrite(backward_pin, 168);
     }
-    else if (movement = -3){
+    else if (movement == -3){
         analogWrite(forward_pin, 255);
         analogWrite(backward_pin, 128);
     }
 
 }
 
-void turnValuesUpdate(){        //Funktiossa tarkastetaan turning-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
-
-    if (turning = 2){
+void turnValuesUpdate()        //Funktiossa tarkastetaan turning-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
+{
+    if (turning == 2){
         analogWrite(right_pin, 0);
         analogWrite(left_pin, 255);
     }
-    else if (turning = 1){
+    else if (turning == 1){
         analogWrite(right_pin, 128);
         analogWrite(left_pin, 255);
     }
-    else if (turning = 0){
+    else if (turning == 0){
         analogWrite(right_pin, 255);
         analogWrite(left_pin, 255);
     }
-    else if (turning = -1){
+    else if (turning == -1){
         analogWrite(right_pin, 255);
         analogWrite(left_pin, 128);
     }
-    else if (turning = -2){
+    else if (turning == -2){
         analogWrite(right_pin, 255);
         analogWrite(left_pin, 0);
     }
