@@ -36,6 +36,14 @@ void setup()
   pinMode(right_pin, OUTPUT);
   pinMode(led_pin, OUTPUT);
   pinMode(9, OUTPUT);
+
+  movement = 0;             // Arvojen asettaminen nolliksi, jotta auto pysyy paikoillaan alussa.
+  turning = 0;
+  speedValuesUpdate();
+  turnValuesUpdate();
+
+  TCCR1A = 0;               // Timerin bittien reset
+  TCCR1B = 0;
 }
 
 void loop()
@@ -131,7 +139,7 @@ Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran pain
 
         else if (results.value == 0X800F040D || results.value == 0X800F840D || results.value == 0X27CFDF92 || results.value == 0X134FED4E){  //Verrataan ir-decoderin tulosta WINDOWS nappiin
 
-            if (flashingLightsState = 0){               // Jos valot eivät ole päällä, käynnistetään valot funktiolla
+            if (flashingLightsState == 0){               // Jos valot eivät ole päällä, käynnistetään valot funktiolla
                 startLedFlashing();
                 flashingLightsState = 1;
             }
