@@ -19,7 +19,7 @@ void stopLedFlashing();     //Funktio, jolla vilkutus sammutetaan
 void startLedFlashing();    //Funktio, jolla vilkutus käynnistetään
 void speedValuesUpdate();   //Funktio, jolla tarkastetaan movement-muuttujan tieto ja päivitetään nopeus sen mukaisesti
 void turnValuesUpdate();    //Funktio, jolla tarkastetaan turning-muuttujan tieto ja päivitetään kääntyminen sen mukaisesti
-
+void smallSpeedBoost();     //Funktio, jolla hetkeksi annetaan moottorille vähän enemmän tehoa. Helpottaa liikkeelle lähtöä.
 
 void setup()
 {
@@ -72,6 +72,11 @@ Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran pain
             if (movement == 3){                          //Jos movement on jo valmiiksi 3, ei tehdä mitään ja tulostetaan serialiin teksti
                 Serial.println("SPEED ALREADY MAXED");
             }
+            else if (movement == 0){                    // Jos auto on pysähdyksissä, ajetaan välissä funktio, joka helpottaa liikkeellelähtöä.
+                movement++;
+                smallSpeedBoost();
+                speedValuesUpdate();
+            }
             else {                                      // Jos movement ei ole 3, lisätään movement-muuttujaan ykkönen ja päivitetään nopeus.
                 movement++;
                 speedValuesUpdate();
@@ -85,6 +90,11 @@ Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran pain
             
             if (movement == -3){                         // Jos movement on jo valmiiksi -3, ei tehdä mitään ja tulostetaan serialiin teksti
                 Serial.println("REVERSE ALREADY MAXED");
+            }
+            else if (movement == 0){                    // Jos auto on pysähdyksissä, ajetaan välissä funktio, joka helpottaa liikkeellelähtöä.
+                movement--;
+                smallSpeedBoost();
+                speedValuesUpdate();
             }
             else {                                      // Jos movement ei ole -3, vähennetään muuttujasta ykkönen ja päivitetään nopeus.
                 movement--;
@@ -198,15 +208,15 @@ void startLedFlashing()        //Timerien rekisterit initialized, valot lähtev�
 void speedValuesUpdate()       //Funktiossa tarkastetaan movement-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
 {
     if (movement == 3){
-        analogWrite(forward_pin, 128);
+        analogWrite(forward_pin, 125);
         analogWrite(backward_pin, 255);
     }
     else if (movement == 2){
-        analogWrite(forward_pin, 168);
+        analogWrite(forward_pin, 155);
         analogWrite(backward_pin, 255);
     }
     else if (movement == 1){
-        analogWrite(forward_pin, 198);
+        analogWrite(forward_pin, 170);
         analogWrite(backward_pin, 255);
     }
     else if (movement == 0){
@@ -215,27 +225,41 @@ void speedValuesUpdate()       //Funktiossa tarkastetaan movement-muuttujan arvo
     }
     else if (movement == -1){
         analogWrite(forward_pin, 255);
-        analogWrite(backward_pin, 198);
+        analogWrite(backward_pin, 170);
     }
     else if (movement == -2){
         analogWrite(forward_pin, 255);
-        analogWrite(backward_pin, 168);
+        analogWrite(backward_pin, 155);
     }
     else if (movement == -3){
         analogWrite(forward_pin, 255);
-        analogWrite(backward_pin, 128);
+        analogWrite(backward_pin, 140);
     }
 
+}
+
+void smallSpeedBoost()          // Funktiossa annetaan moottoreille pieneksi hetkeksi isommat arvot. Helpottaa liikkeelle pääsyä.
+{
+    if (movement == 1){
+        analogWrite(forward_pin, 50);
+        analogWrite(backward_pin, 255);
+        delay(80);
+    }
+    else if (movement == -1){
+        analogWrite(forward_pin, 255);
+        analogWrite(backward_pin, 50);
+        delay(80);
+    }
 }
 
 void turnValuesUpdate()        //Funktiossa tarkastetaan turning-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
 {
     if (turning == 2){
-        analogWrite(right_pin, 0);
+        analogWrite(right_pin, 100);
         analogWrite(left_pin, 255);
     }
     else if (turning == 1){
-        analogWrite(right_pin, 128);
+        analogWrite(right_pin, 168);
         analogWrite(left_pin, 255);
     }
     else if (turning == 0){
@@ -244,11 +268,11 @@ void turnValuesUpdate()        //Funktiossa tarkastetaan turning-muuttujan arvo 
     }
     else if (turning == -1){
         analogWrite(right_pin, 255);
-        analogWrite(left_pin, 128);
+        analogWrite(left_pin, 168);
     }
     else if (turning == -2){
         analogWrite(right_pin, 255);
-        analogWrite(left_pin, 0);
+        analogWrite(left_pin, 100);
     }
 
 }
