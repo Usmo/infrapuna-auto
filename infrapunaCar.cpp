@@ -5,7 +5,8 @@ IRrecv receiver(RECEIVER_PIN);      // create a receiver object of the IRrecv cl
 decode_results results;             // create a results object of the decode_results class
 unsigned long key_value = 0;        // variable to store the pressed key value
 
-int buttonState = 0;
+volatile int bumperButtonState = 0; // Muuttuja, jolla seurataan mahdollisia törmäyksiä keskeytyksien avulla.
+int bumper_pin = 2;                 // puskurin 
 int forward_pin = 6;                // Määritellään pinnit joilla ohjataan moottoreita
 int backward_pin = 5;
 int left_pin = 11;
@@ -15,6 +16,7 @@ int flashingLightsState = 0;        //Muuttujalla seurataan vilkkuvien valojen t
 int movement = 0;           //muuttujalla seurataan liikkumistilaa.  Positiivinen eteenpäin ja negatiivinen taaksepäin.
 int turning = 0;            //muuttujalla seurataan kääntymistilaa.  Positiivinen oikealle ja negatiivinen vasemmalle.
 
+void bumperHit();           //Keskeytysfunktio, jossa muutetaan bumperButtonState-muuttujaan 1.
 void stopLedFlashing();     //Funktio, jolla vilkutus sammutetaan
 void startLedFlashing();    //Funktio, jolla vilkutus käynnistetään
 void speedValuesUpdate();   //Funktio, jolla tarkastetaan movement-muuttujan tieto ja päivitetään nopeus sen mukaisesti
@@ -27,8 +29,9 @@ void setup()
   Serial.begin(9600);       // begin serial communication with a baud rate of 9600
   receiver.enableIRIn();    // enable the receiver
   receiver.blink13(true);   // enable blinking of the built-in LED when an IR signal is received
-  //pinMode(2, INPUT);
-  pinMode(13, OUTPUT);
+
+  attachInterrupt(digitalPinToInterrupt(bumper_pin),bumperHit, RISING);     //Määrittely keskeytyksiä varten. Tässä tapauksessa puskurin kytkin ohjaa keskeytyksiä.
+  pinMode(bumper_pin, INPUT);
   
   pinMode(forward_pin, OUTPUT);     //Pinnien määrittelyt outputeiksi
   pinMode(backward_pin, OUTPUT);
@@ -36,6 +39,7 @@ void setup()
   pinMode(right_pin, OUTPUT);
   pinMode(led_pin, OUTPUT);
   pinMode(9, OUTPUT);
+  pinMode(13, OUTPUT);
 
   movement = 0;             // Arvojen asettaminen nolliksi, jotta auto pysyy paikoillaan alussa.
   turning = 0;
@@ -48,7 +52,32 @@ void setup()
 
 void loop()
 {
-  
+
+
+if (bumperButtonState == 1){           //Jos törmäys on kirjattu muuttujaan, ajetaan funktio jossa auto pysäytetään hetkeksi ja vilkutetaan ledejä.
+    movement = 0;
+    speedValuesUpdate();
+
+    TCCR1A = 0;
+    TCCR1B = 0;
+    bitSet(TCCR1B, CS11);     // 8 prescaler, että vilkkuminen olisi nopeampaa
+    bitSet(TCCR1A, COM1A0);   // Toggle pin OC1A (9)
+    digitalWrite(led_pin, HIGH);
+    
+    delay(1000);                        // Pieni viive, jolloin ledit vilkkuvat ja auto pysyy paikoillaan.
+
+    if (flashingLightsState == 1){      // Jos ledit olivat vilkkumassa ennen keskeytystä, ledien vilkunta säädetään takaisin vilkkumaan normaalisti.
+        TCCR1A = 0;
+        TCCR1B = 0;
+        startLedFlashing();
+    }
+    else{                               // Ledien vilkunta sammutetaan, jos ledit eivät olleet päällä aiemmin.
+        stopLedFlashing();
+    }
+
+    bumperButtonState = 0;              // Lopuksi nollataan törmäyksen muuttuja.
+}
+
   /*
 
 Nappien koodit:
@@ -65,7 +94,7 @@ Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran pain
 
   */
 
-    if (receiver.decode(&results)) {                    //Jos ir-decoderi saa arvon
+    if (receiver.decode(&results)) {                    //Jos ir-decoderi saa arvon, verrataan arvoa määriteltyihin arvoihin ja toimitaan sen mukaisesti.
 
         if (results.value == 0X800F041E || results.value == 0X800F841E || results.value == 0X1E69883 || results.value == 0XA36FD29F) {  //Verrataan ir-decoderin tulosta YLÖS nappiin
 
@@ -83,6 +112,7 @@ Suluissa olevat arvot tulee sen jälkeen, kun oikealle painiketta on kerran pain
             }
 
             Serial.println("UP BUTTON PRESSED");        // Tulostetaan serial-monitoriin tieto painetusta napista.
+            Serial.println(movement); 
             delay(100);                                 // Pieni viive, jotta yhdestä painalluksesta ei rekisteröityisi tahattomia lisäpainalluksia.
         }
 
@@ -252,7 +282,7 @@ void smallSpeedBoost()          // Funktiossa annetaan moottoreille pieneksi het
     }
 }
 
-void turnValuesUpdate()        //Funktiossa tarkastetaan turning-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
+void turnValuesUpdate()         //Funktiossa tarkastetaan turning-muuttujan arvo ja muokataan moottorinohjauspinnien arvot sen mukaisesti.
 {
     if (turning == 2){
         analogWrite(right_pin, 100);
@@ -275,4 +305,9 @@ void turnValuesUpdate()        //Funktiossa tarkastetaan turning-muuttujan arvo 
         analogWrite(left_pin, 100);
     }
 
+}
+
+void bumperHit(){                               // ISR-funktio, jossa törmäyksiä seuraavaan muuttujaan asetetaan 1.
+    bumperButtonState = 1;
+    Serial.println("BUMPER BUTTON PRESSED");    // Tulostetaan serial-monitoriin tieto puskuripainikkeen painalluksesta.
 }
